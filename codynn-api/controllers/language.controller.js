@@ -1,6 +1,6 @@
 const LanguageModel = require('../models/language.schema');
 const VideoModel = require('../models/video.schema');
-const repositoryModel = require('../models/repository.schema');
+
 
 const createLanguage = async (req, res) => {
     try {
@@ -65,16 +65,10 @@ const deleteLanguage = async (req, res) => {
     try {
         const languageID = req.params.id;
 
-        const languageExistsInVideo = await VideoModel.findOne({ language: languageID });
-        if (languageExistsInVideo) {
+        const languageExists = await VideoModel.findOne({ language: languageID });
+        if (languageExists) {
             return res.status(404).json({ message: 'Cannot Delete language since there is a video related' });
         }
-
-        const languageExistsInRepository = await repositoryModel.findOne({ language: languageID });
-        if (languageExistsInRepository) {
-            return res.status(404).json({ message: 'Cannot Delete language since there is a Repository related' });
-        }
-        
         const deletedLanguage = await LanguageModel.findByIdAndDelete(languageID);
         if (!deletedLanguage) {
             return res.status(404).json({ error: 'Language not found' });
