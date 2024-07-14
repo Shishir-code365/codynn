@@ -15,8 +15,8 @@ const createRepository = async (req, res) => {
         res.status(201).json({
             message: 'Repository created successfully',
             repository,
-            totalRepositories,
-            totalPages
+            totalRepositories: totalRepositories,
+            totalPages: totalPages
         });
 } catch (error) {
     console.error('Error creating repository:', error);
@@ -24,4 +24,14 @@ const createRepository = async (req, res) => {
 }
 }
 
-module.exports = { createRepository };
+const getRepositories = async(req, res) => {
+    try{
+
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' });
+    }
+}
+
+module.exports = { createRepository,getRepositories};
