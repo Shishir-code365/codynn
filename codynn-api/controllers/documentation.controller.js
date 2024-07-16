@@ -114,4 +114,16 @@ const deleteDocumentation = async(req,res)=>{
         return res.status(404).json("Error")
     }
 }
-module.exports = {createDocumentation,getDocumentation,sortDocumentation, updateDocumentation,deleteDocumentation}
+
+const searchDocumentation = async(req,res)=>{
+    try{
+        const findDoc = await documentationModel.find({ title: { $regex: req.body.search, $options: 'i' } });
+        res.status(200).json({ findDoc });
+    }
+    catch(error)
+    {
+        console.log(error);
+        return res.status(404).json("Error")
+    }
+}
+module.exports = {createDocumentation,getDocumentation,sortDocumentation, updateDocumentation,deleteDocumentation,searchDocumentation}
