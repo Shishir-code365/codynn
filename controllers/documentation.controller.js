@@ -368,6 +368,43 @@ const updateDocumentation = async(req,res)=>{
     }
 }
 
+/**
+ * @swagger
+ * /api/documentation/delete/{id}:
+ *   delete:
+ *     summary: Delete documentation by ID
+ *     tags: [Documentation]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The documentation ID
+ *     responses:
+ *       '200':
+ *         description: Documentation deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 deletedDoc:
+ *                   $ref: '#/components/schemas/Documentation'
+ *       '404':
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
+
 const deleteDocumentation = async(req,res)=>{
     try{
         const docID = req.params.id;
@@ -384,8 +421,44 @@ const deleteDocumentation = async(req,res)=>{
     }
 }
 
+/**
+ * @swagger
+ * /api/documentation/search/{searchTerm}:
+ *   get:
+ *     summary: Search documentations by title
+ *     tags: [Documentation]
+ *     parameters:
+ *       - in: query
+ *         name: searchTerm
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Search term to find documentations by title
+ *     responses:
+ *       '200':
+ *         description: Successful response with found documentations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 findDoc:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Documentation'
+ *       '404':
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Error
+ */
+
+
 const searchDocumentation = async(req,res)=>{
     try{
+        const searchTerm = req.params.search;
         const findDoc = await documentationModel.find({ title: { $regex: searchTerm, $options: 'i' } });
         res.status(200).json({ findDoc });
     }

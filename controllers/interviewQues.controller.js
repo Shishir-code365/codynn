@@ -93,6 +93,7 @@ const deleteQuestions = async(req,res)=>{
 
 const searchQuestions = async (req, res) => {
     try {
+        const searchTerm = req.params.search;
         const question = await interviewQuesModel.find({ question: { $regex: searchTerm, $options: 'i' } });
         res.status(200).json({ question });
     } catch (error) {

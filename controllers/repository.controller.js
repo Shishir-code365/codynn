@@ -98,7 +98,7 @@ const deleteRepository = async (req, res) => {
 
 const searchRepo = async(req,res)=>{
     try{
-
+        const searchTerm = req.params.search;
         const repository = await repoModel.find({ title: { $regex: searchTerm , $options: 'i' } });
         res.status(200).json({ repository });
 
