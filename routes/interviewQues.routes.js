@@ -7,6 +7,6 @@ router.post('/create',paginationMiddleware(),createQuestions);
 router.get('/get/:id?',paginationMiddleware(),getQuestions);
 router.put('/update/:id',updateQuestions);
 router.delete('/delete/:id',deleteQuestions);
-router.get('/search',searchQuestions);
+router.get('/search/:search',searchQuestions);
 
 module.exports = router;

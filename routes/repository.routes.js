@@ -6,7 +6,7 @@ router.post('/create',paginationMiddleware(), createRepository);
 router.get('/get/:id?', paginationMiddleware(), getRepositories);
 router.put('/update/:id', upateRepository);
 router.delete('/delete/:id', deleteRepository);
-router.get('/search', searchRepo);
+router.get('/search/:search', searchRepo);
 
 
 module.exports = router;

@@ -7,6 +7,6 @@ router.get('/get/:id?',paginationMiddleware(),getDocumentation);
 router.get('/sort',sortDocumentation);
 router.put('/update/:id',updateDocumentation);
 router.delete('/delete/:id',deleteDocumentation);
-router.get('/search',searchDocumentation);
+router.get('/search/:search',searchDocumentation);
 
 module.exports = router;

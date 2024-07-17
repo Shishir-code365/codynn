@@ -1,4 +1,94 @@
 const documentationModel = require('../models/documentation.schema');
+const { search } = require('../routes/video.routes');
+/**
+ * @swagger
+ *  components:
+ *   schemas:
+ *     Documentation:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         title:
+ *           type: string
+ *         content:
+ *           type: array
+ *           items:
+ *             type: string
+ *         popularity:
+ *           type: number
+ *         createdAt:
+ *           type: string
+ *         updatedAt:
+ *           type: string
+ */
+/**
+ * @swagger
+ * /api/documentation/create:
+ *     post:
+ *       summary: Create new documentation
+ *       tags: [Documentation]
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                 content:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 popularity:
+ *                   type: number
+ *       parameters:
+ *         - in: query
+ *           name: limit
+ *           schema:
+ *             type: integer
+ *           description: Maximum number of documentations per page
+ *       responses:
+ *         '200':
+ *           description: Documentation created successfully
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   success:
+ *                     type: boolean
+ *                     example: true
+ *                   message:
+ *                     type: string
+ *                     example: Documentation created successfully
+ *                   newDocumentation:
+ *                     $ref: '#/components/schemas/Documentation'
+ *                   totalDocumentations:
+ *                     type: integer
+ *                     example: 10
+ *                   totalPages:
+ *                     type: integer
+ *                     example: 2
+ *         '400':
+ *           description: Documentation already exists
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *                     example: Documentation already exists
+ *         '404':
+ *           description: Error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: string
+ *                 example: Error
+ */
 const createDocumentation = async(req,res)=>{
     try{
         const MAX_DOCUMENTATION_PER_PAGE = parseInt(req.query.limit);
@@ -28,6 +118,79 @@ const createDocumentation = async(req,res)=>{
     }
 }
 
+/**
+ * @swagger
+ * /api/documentation/get/{id}:
+ *   get:
+ *     summary: Get documentation by ID
+ *     tags: [Documentation]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The documentation ID
+ *     responses:
+ *       '200':
+ *         description: Successful response with documentation data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 documentation:
+ *                   $ref: '#/components/schemas/Documentation'
+ *       '404':
+ *         description: Documentation not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ * 
+ * /api/documentation/get:
+ *   get:
+ *     summary: Get all documentations with pagination
+ *     tags: [Documentation]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Maximum number of documentations per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number
+ *     responses:
+ *       '200':
+ *         description: Successful response with paginated documentation data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 documentation:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Documentation'
+ *                 totalDocumentations:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *       '404':
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ */
+
+
 const getDocumentation = async(req,res)=>{
     try{
         const docID = req.params.id;
@@ -54,6 +217,48 @@ const getDocumentation = async(req,res)=>{
         return res.status(404).json("Error")
     }
 }
+
+/**
+ * @swagger
+ * /api/documentation/sort:
+ *   get:
+ *     summary: Sort documentations
+ *     tags: [Documentation]
+ *     parameters:
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The sorting criterion (popularity or alphabetical)
+ *         example: popularity
+ *     responses:
+ *       '200':
+ *         description: Successful response with sorted documentations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sortedDocumentations:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Documentation'
+ *                 Documentations:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Documentation'
+ *       '404':
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Error
+ */
+
+
+
 const sortDocumentation = async(req,res)=>{
     
     try{
@@ -81,6 +286,70 @@ const sortDocumentation = async(req,res)=>{
         return res.status(404).json("Error")
     }
 }
+
+/**
+ * @swagger
+ * /api/documentation/update/{id}:
+ *   put:
+ *     summary: Update documentation by ID
+ *     tags: [Documentation]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The documentation ID
+ *       - in: body
+ *         name: body
+ *         description: Fields for the documentation to update
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             title:
+ *               type: string
+ *               example: "Updated Title"
+ *             content:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               example: ["Updated content line 1", "Updated content line 2"]
+ *             popularity:
+ *               type: number
+ *               example: 5
+ *     responses:
+ *       '200':
+ *         description: Documentation updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Documentation updated successfully
+ *                 updatedDoc:
+ *                   $ref: '#/components/schemas/Documentation'
+ *       '404':
+ *         description: Documentation not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Documentation not found
+ *       '400':
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: Error
+ */
+
 
 const updateDocumentation = async(req,res)=>{
     try{
@@ -117,7 +386,7 @@ const deleteDocumentation = async(req,res)=>{
 
 const searchDocumentation = async(req,res)=>{
     try{
-        const findDoc = await documentationModel.find({ title: { $regex: req.body.search, $options: 'i' } });
+        const findDoc = await documentationModel.find({ title: { $regex: searchTerm, $options: 'i' } });
         res.status(200).json({ findDoc });
     }
     catch(error)
