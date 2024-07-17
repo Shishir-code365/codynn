@@ -25,6 +25,10 @@ const VideoSchema = new mongoose.Schema({
         ref: 'Language',
         required: true,
     },
+    url: {
+        type: String,
+        required: true
+    }
 },{
     timestamps: true
 });
