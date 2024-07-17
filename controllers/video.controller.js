@@ -118,7 +118,7 @@ const updateVideo = async (req, res) => {
 const searchVideo = async (req, res) => {
     try {
         const searchTerm = req.params.search;
-        const videos = await VideoModel.find({ title: { $regex: searchTerm, $options: 'i' } });
+        const videos = await VideoModel.find({ title: { $regex: searchTerm, $options: 'i' } });//param search
         res.status(200).json({ videos });
     } catch (error) {
         console.error('Error searching videos:', error);
