@@ -428,7 +428,7 @@ const deleteDocumentation = async(req,res)=>{
  *     summary: Search documentations by title
  *     tags: [Documentation]
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: searchTerm
  *         schema:
  *           type: string
@@ -452,7 +452,6 @@ const deleteDocumentation = async(req,res)=>{
  *           application/json:
  *             schema:
  *               type: string
- *               example: Error
  */
 
 
