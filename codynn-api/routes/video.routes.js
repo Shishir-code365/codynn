@@ -8,6 +8,6 @@ router.get('/get', paginationMiddleware(), videoController.getVideos);
 router.get('/get/:id', videoController.getVideoByID);
 router.delete('/delete/:id', videoController.deleteVideo);
 router.put('/update/:id', videoController.updateVideo);
-router.get('/search', videoController.searchVideo);
+router.get('/search/:search', videoController.searchVideo);
 
 module.exports = router

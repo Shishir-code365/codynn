@@ -6,7 +6,7 @@ const LanguageModel = require('../models/language.schema');
 const createVideo = async (req, res) => {
     try {
         const MAX_VIDEOS_PER_PAGE = parseInt(req.query.limit);
-        const { image, duration, title, level, language } = req.body;
+        const { image, duration, title, level, language,url } = req.body;
 
         const languageExists = await LanguageModel.findById(language);
         if (!languageExists) {
@@ -18,7 +18,8 @@ const createVideo = async (req, res) => {
             duration,
             title,
             level,
-            language
+            language,
+            url
         });
 
         await video.save();
@@ -101,7 +102,8 @@ const updateVideo = async (req, res) => {
             duration,
             title,
             level,
-            language
+            language,
+            url
         }, { new: true });
         if (!video) {
             return res.status(404).json({ error: 'Video not found' });
@@ -115,12 +117,14 @@ const updateVideo = async (req, res) => {
 
 const searchVideo = async (req, res) => {
     try {
-        const videos = await VideoModel.find({ title: { $regex: req.body.search, $options: 'i' } });
+        const searchTerm = req.params.search;
+        const videos = await VideoModel.find({ title: { $regex: searchTerm, $options: 'i' } });
         res.status(200).json({ videos });
     } catch (error) {
         console.error('Error searching videos:', error);
         res.status(500).json({ error: 'Server error' });
     }
 };
+
 
 module.exports = { createVideo, getVideos,getVideoByID, deleteVideo, updateVideo, searchVideo };
