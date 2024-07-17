@@ -1,5 +1,91 @@
 const interviewQuesModel = require('../models/interviewQues.schema')
 const jobRoleModel = require('../models/jobRole.schema')
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     InterviewQuestion:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated ID of the question.
+ *         question:
+ *           type: string
+ *           description: The question text.
+ *         answer:
+ *           type: string
+ *           description: The answer to the question.
+ *         jobRole:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *               description: The ID of the associated job role.
+ *             name:
+ *               type: string
+ *               description: The name of the associated job role.
+ *           description: The job role associated with the question.
+ *         level:
+ *           type: string
+ *           enum:
+ *             - Internship
+ *             - Junior Level
+ *             - Mid Level
+ *             - Senior Level
+ *           description: The level of the question.
+ *       required:
+ *         - question
+ *         - answer
+ *         - jobRole
+ *         - level
+ */
+
+/**
+ * @swagger
+ * /api/interviewQuestions/create:
+ *   post:
+ *     summary: Create a new question
+ *     tags: [InterviewQuestion]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/InterviewQuestion'
+ *     responses:
+ *       '201':
+ *         description: Question created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 newQuestion:
+ *                   $ref: '#/components/schemas/InterviewQuestion'
+ *                 totalQuestions:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *       '400':
+ *         description: Invalid job role or other client error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 const createQuestions = async(req,res)=>{
     try{
         const MAX_REPOSITORIES_PER_PAGE = parseInt(req.query.limit);
@@ -21,6 +107,79 @@ const createQuestions = async(req,res)=>{
         return res.status(404).json({error: 'Server error'});
     }
 }
+
+/**
+ * @swagger
+ * /api/interviewQuestions/get/{id}:
+ *   get:
+ *     summary: Get a question by ID
+ *     tags: [InterviewQuestion]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the question to get
+ *     responses:
+ *       '200':
+ *         description: Successful response with the question
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/InterviewQuestion'
+ *       '404':
+ *         description: Question not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Question not found
+ */
+
+/**
+ * @swagger
+ * /api/interviewQuestions/get:
+ *   get:
+ *     summary: Get all questions with pagination
+ *     tags: [InterviewQuestion]
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Maximum number of questions per page
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Page number
+ *     responses:
+ *       '200':
+ *         description: Successful response with paginated questions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *                 questions:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/InterviewQuestion'
+ */
 
 const getQuestions = async(req,res)=>{
     try{
@@ -51,6 +210,58 @@ const getQuestions = async(req,res)=>{
     }
 }
 
+
+/**
+ * @swagger
+ * /api/interviewQuestions/update/{id}:
+ *   put:
+ *     summary: Update a question by ID
+ *     tags: [InterviewQuestion]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the question to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/InterviewQuestion'
+ *     responses:
+ *       '200':
+ *         description: Question updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 updatedQuestion:
+ *                   $ref: '#/components/schemas/InterviewQuestion'
+ *       '400':
+ *         description: Invalid job role or other client error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       '404':
+ *         description: Question not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
 const updateQuestions = async(req,res)=>{
     try{
         const questionID = req.params.id;
@@ -76,6 +287,42 @@ const updateQuestions = async(req,res)=>{
     }
 }
 
+/**
+ * @swagger
+ * /api/interviewQuestions/delete/{id}:
+ *   delete:
+ *     summary: Delete a question by ID
+ *     tags: [InterviewQuestion]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the question to delete
+ *     responses:
+ *       '200':
+ *         description: Question deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 deletedQuestion:
+ *                   $ref: '#/components/schemas/InterviewQuestion'
+ *       '404':
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
 const deleteQuestions = async(req,res)=>{
     try{
         const questionID = req.params.id;
@@ -90,6 +337,43 @@ const deleteQuestions = async(req,res)=>{
         return res.status(404).json({error: 'Server error'});
     }
 }
+
+/**
+ * @swagger
+ * /api/interviewQuestions/search/{searchTerm}:
+ *   get:
+ *     summary: Search questions by title
+ *     tags: [InterviewQuestion]
+ *     parameters:
+ *       - in: path
+ *         name: searchTerm
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Search term to find questions by title
+ *     responses:
+ *       '200':
+ *         description: Successful response with found questions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 question:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/InterviewQuestion'
+ *       '404':
+ *         description: Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Error searching questions
+ */
 
 const searchQuestions = async (req, res) => {
     try {
