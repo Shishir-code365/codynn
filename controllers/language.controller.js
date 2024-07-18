@@ -2,6 +2,116 @@ const LanguageModel = require('../models/language.schema');
 const VideoModel = require('../models/video.schema');
 const repoModel = require('../models/repository.schema');
 
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Language:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The auto-generated ID of the language.
+ *         languageType:
+ *           type: string
+ *           description: The type of the language.
+ *         languageExtension:
+ *           type: string
+ *           description: The file extension associated with the language.
+ *         appIcon:
+ *           type: string
+ *           description: The URL of the application icon.
+ *         applicationName:
+ *           type: string
+ *           description: The name of the application.
+ *         appStoreLink:
+ *           type: string
+ *           description: The URL link to the application on the App Store.
+ *         bannerImage:
+ *           type: string
+ *           description: The URL of the banner image.
+ *         description:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: A list of descriptions for the language.
+ *         playstoreLink:
+ *           type: string
+ *           description: The URL link to the application on the Play Store.
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: A list of image URLs associated with the language.
+ *         qrImage:
+ *           type: string
+ *           description: The URL of the QR image.
+ *         features:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               featureTitle:
+ *                 type: string
+ *                 description: The title of the feature.
+ *               featureDescription:
+ *                 type: string
+ *                 description: The description of the feature.
+ *       required:
+ *         - languageType
+ *         - appIcon
+ *         - applicationName
+ *         - description
+ *         - images
+ *         - features
+ */
+
+
+/**
+ * @swagger
+ * /api/languages/create:
+ *   post:
+ *     summary: Create a new language
+ *     tags: [Language]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Language'
+ *     responses:
+ *       '201':
+ *         description: Language created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 language:
+ *                   $ref: '#/components/schemas/Language'
+ *       '400':
+ *         description: Language already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       '500':
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
 const createLanguage = async (req, res) => {
     try {
         const { languageType, languageExtension, appIcon, applicationName, appStoreLink, bannerImage, description, playstoreLink, images, qrImage, features } = req.body;
@@ -36,6 +146,94 @@ const createLanguage = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /api/languages/getlanguage/{id}:
+ *   get:
+ *     summary: Get a language by ID
+ *     tags: [Language]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the language to get
+ *     responses:
+ *       '200':
+ *         description: Successful response with the language
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Language'
+ *       '404':
+ *         description: No language found with that ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *       '500':
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
+/**
+ * @swagger
+ * /api/languages/getlanguage:
+ *   get:
+ *     summary: Get all languages
+ *     tags: [Language]
+ *     responses:
+ *       '200':
+ *         description: Successful response with all languages
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 getAllLanguages:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Language'
+ *       '404':
+ *         description: No languages found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       '500':
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
+
 
 const getLanguage = async (req, res) => {
     try{
@@ -60,6 +258,51 @@ const getLanguage = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 }
+
+/**
+ * @swagger
+ * /api/languages/deletelanguage/{id}:
+ *   delete:
+ *     summary: Delete a language by ID
+ *     tags: [Language]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the language to delete
+ *     responses:
+ *       '200':
+ *         description: Language deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 deletedLanguage:
+ *                   $ref: '#/components/schemas/Language'
+ *       '404':
+ *         description: Language not found or cannot delete due to related videos or repositories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       '500':
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 
 const deleteLanguage = async (req, res) => {
     try {
