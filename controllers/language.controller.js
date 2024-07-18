@@ -329,4 +329,71 @@ const deleteLanguage = async (req, res) => {
     }
 };
 
-module.exports = { createLanguage, getLanguage, deleteLanguage };
+/**
+ * @swagger
+ * /api/languages/updatelanguage/{id}:
+ *   put:
+ *     summary: Update a language by ID
+ *     tags: [Language]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the language to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Language'
+ *     responses:
+ *       '200':
+ *         description: Language updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 updatedLanguage:
+ *                   $ref: '#/components/schemas/Language'
+ *       '404':
+ *         description: Language not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       '500':
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
+const updateLanguage = async (req, res) => {
+    try{
+        const languageID = req.params.id;
+        const findLanguage = await LanguageModel.findById(languageID);
+        if(!findLanguage){
+            return res.status(404).json({success:false,message:"No language found with that id"})
+        }
+        const updatedLanguage = await LanguageModel.findByIdAndUpdate(languageID, req.body, { new: true });
+        res.status(200).json({success:true,message:"Successfully updated language",updatedLanguage})
+    }
+    catch(error){
+        console.error('Error updating language:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+module.exports = { createLanguage, getLanguage, deleteLanguage, updateLanguage };
