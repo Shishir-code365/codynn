@@ -139,48 +139,64 @@ const createQuestions = async(req,res)=>{
  *                   type: string
  *                   example: Question not found
  */
-
 /**
- * @swagger
- * /api/interviewQuestions/get:
- *   get:
- *     summary: Get all questions with pagination
- *     tags: [InterviewQuestion]
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         required: true
- *         description: Maximum number of questions per page
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         required: true
- *         description: Page number
- *     responses:
- *       '200':
- *         description: Successful response with paginated questions
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 total:
- *                   type: integer
- *                 page:
- *                   type: integer
- *                 limit:
- *                   type: integer
- *                 totalPages:
- *                   type: integer
- *                 questions:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/InterviewQuestion'
- */
-
+* @swagger
+* /api/interviewquestions/get:
+*   get:
+*     summary: Get all questions with pagination
+*     tags: [InterviewQuestion]
+*     parameters:
+*       - in: query
+*         name: limit
+*         schema:
+*           type: integer
+*         description: Maximum number of questions per page
+*       - in: query
+*         name: page
+*         schema:
+*           type: integer
+*         description: Page number
+*       - in: query
+*         name: search
+*         schema:
+*           type: string
+*         description: Search term for questions
+*       - in: query
+*         name: jobRole
+*         schema:
+*           type: string
+*         description: Job role ID to filter questions
+*       - in: query
+*         name: level
+*         schema:
+*           type: string
+*         description: Level to filter questions
+*     responses:
+*       '200':
+*         description: Successful response with paginated question data
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 questions:
+*                   type: array
+*                   items:
+*                     $ref: '#/components/schemas/Question'
+*                 totalQuestions:
+*                   type: integer
+*                 totalPages:
+*                   type: integer
+*       '404':
+*         description: Error
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 error:
+*                   type: string
+*/
 const getQuestions = async(req,res)=>{
     try{
         const questionID = req.params.id;

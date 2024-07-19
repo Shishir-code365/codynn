@@ -145,35 +145,55 @@ const createVideo = async (req, res) => {
  *     tags: [Video]
  *     parameters:
  *       - in: query
- *         name: limit
+ *         name: search
  *         schema:
- *           type: integer
- *           description: The number of videos to return per page.
+ *           type: string
+ *         description: Search term for video titles
+ *       - in: query
+ *         name: language
+ *         schema:
+ *           type: string
+ *         description: Language ID to filter videos
+ *       - in: query
+ *         name: level
+ *         schema:
+ *           type: string
+ *         description: Level of the videos (beginner, intermediate, advanced)
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
- *           description: The page number.
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Maximum number of videos per page
  *     responses:
  *       '200':
- *         description: Successful response with all videos
+ *         description: Successful response with paginated video data
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 total:
- *                   type: number
- *                 page:
- *                   type: number
- *                 limit:
- *                   type: number
- *                 totalPages:
- *                   type: number
  *                 videos:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Video'
+ *                 totalVideos:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *       '400':
+ *         description: Invalid query parameter
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  *       '500':
  *         description: Server error
  *         content:
@@ -183,8 +203,8 @@ const createVideo = async (req, res) => {
  *               properties:
  *                 error:
  *                   type: string
- *                   example: Server error
  */
+
 
 const getVideos = async (req, res) => {
     try {

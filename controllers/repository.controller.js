@@ -141,53 +141,59 @@ const createRepository = async (req, res) => {
  *                 error:
  *                   type: string
  */
-
 /**
- * @swagger
- * /api/repositories/get:
- *   get:
- *     summary: Get all repositories with pagination
- *     tags: [Repository]   
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         description: The page number.
- *     responses:
- *       '200':
- *         description: Successful response with all repositories
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 total:
- *                   type: number
- *                 page:
- *                   type: number
- *                 limit:
- *                   type: number
- *                 totalPages:
- *                   type: number
- *                 repositories:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Repository'
- *       '500':
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- */
+* @swagger
+* /api/repositories/get:
+*   get:
+*     summary: Get all repositories with pagination
+*     tags: [Repository]
+*     parameters:
+*       - in: query
+*         name: language
+*         schema:
+*           type: string
+*         description: Language ID to filter repositories
+*       - in: query
+*         name: search
+*         schema:
+*           type: string
+*         description: Search term for repository titles
+*       - in: query
+*         name: page
+*         schema:
+*           type: integer
+*         description: Page number
+*       - in: query
+*         name: limit
+*         schema:
+*           type: integer
+*         description: Maximum number of repositories per page
+*     responses:
+*       '200':
+*         description: Successful response with paginated repository data
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 repositories:
+*                   type: array
+*                   items:
+*                     $ref: '#/components/schemas/Repository'
+*                 totalRepositories:
+*                   type: integer
+*                 totalPages:
+*                   type: integer
+*       '500':
+*         description: Server error
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 error:
+*                   type: string
+*/
 
 
 const getRepositories = async(req, res) => {
