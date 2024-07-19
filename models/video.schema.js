@@ -1,7 +1,7 @@
 const { default: mongoose } = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-const levels = ["beginner", "advanced", "intermediate"];
+const levels = ["beginner", "advance", "intermediate"];
 
 const VideoSchema = new mongoose.Schema({
     image:{

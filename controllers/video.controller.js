@@ -133,7 +133,7 @@ const createVideo = async (req, res) => {
         });
     } catch (error) {
         console.error('Error creating video:', error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: error });
     }
 };
 
@@ -188,24 +188,48 @@ const createVideo = async (req, res) => {
 
 const getVideos = async (req, res) => {
     try {
-        const MAX_VIDEOS_PER_PAGE = parseInt(req.query.limit);
-        const { startIndex, limit } = req.pagination;
+        
+        const { search, language, level, page, limit} = req.query;
 
-        const videos = await VideoModel.find()
-            .populate('language')
-            .limit(limit)
-            .skip(startIndex);
 
-        const totalVideos = await VideoModel.countDocuments();
-        const totalPages = Math.ceil(totalVideos / MAX_VIDEOS_PER_PAGE);
+        let query = {};
+        if (search) {
+            query.title = { $regex: search, $options: 'i' }; 
+        }
+        if (language) {
+            const languageExists = await LanguageModel.findById(language);
+            if (!languageExists) {
+                return res.status(400).json({ error: 'Invalid language ID' });
+            }
+            query.language = language; 
+        }
+        if (level) {
+            
+            const levels = await VideoModel.schema.path('level').enumValues.includes(level);
+            if (!levels) {
+                return res.status(400).json({ error: 'Invalid level' });
+            }
+            query.level = level;
+            
+        }
+
+        if (Object.keys(query).length === 0) {
+            query = {}; 
+        }
+    
+        const options = {
+            page: parseInt(page,10)||1,
+            limit: parseInt(limit,10)||6,
+            populate: 'language',
+        };
+        
+        const videos = await VideoModel.paginate(query, options);
 
         res.status(200).json({
-            total: totalVideos,
-            page: req.pagination.page,
-            limit: req.pagination.limit,
-            totalPages: totalPages,
+            
             videos
         });
+       
     } catch (error) {
         console.error('Error fetching videos:', error);
         res.status(500).json({ error: 'Server error' });
@@ -403,50 +427,4 @@ const updateVideo = async (req, res) => {
     }
 };
 
-/**
- * @swagger
- * /api/videos/search/{search}:
- *   get:
- *     summary: Search videos by title
- *     tags: [Video]
- *     parameters:
- *       - in: path
- *         name: search
- *         schema:
- *           type: string
- *         required: true
- *         description: The search term for the video title
- *     responses:
- *       '200':
- *         description: Successful response with matching videos
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Video'
- *       '500':
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- */
-
-
-const searchVideo = async (req, res) => {
-    try {
-        const searchTerm = req.params.search;
-        const videos = await VideoModel.find({ title: { $regex: searchTerm, $options: 'i' } });//param search
-        res.status(200).json({ videos });
-    } catch (error) {
-        console.error('Error searching videos:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-};
-
-
-module.exports = { createVideo, getVideos,getVideoByID, deleteVideo, updateVideo, searchVideo };
+module.exports = { createVideo, getVideos,getVideoByID, deleteVideo, updateVideo };

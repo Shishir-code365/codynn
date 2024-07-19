@@ -104,7 +104,7 @@ const createQuestions = async(req,res)=>{
 
     }catch(error){
         console.log(error);
-        return res.status(404).json({error: 'Server error'});
+        return res.status(404).json({error: error});
     }
 }
 
@@ -192,17 +192,42 @@ const getQuestions = async(req,res)=>{
             return res.status(200).json({question});
         }
 
-        const MAX_QUESTIONS_PER_PAGE = parseInt(req.query.limit);
-        const { startIndex, limit } = req.pagination;
+        const {search,jobRole,level,page,limit} = req.query;
+        let query = {};
 
-        const questions = await interviewQuesModel.find()
-        .populate('jobRole')
-        .limit(limit)
-        .skip(startIndex);
-        const totalQuestions = await interviewQuesModel.countDocuments();
-        const totalPages = Math.ceil(totalQuestions / MAX_QUESTIONS_PER_PAGE);
-        return res.status(200).json({total: totalQuestions, page: req.pagination.page, limit: req.pagination.limit, totalPages: totalPages, questions});
+        if(search)
+        {
+            query.question = { $regex: search, $options: 'i' };
+        }
+        if(jobRole)
+        {
+            const jobRoleExists = await jobRoleModel.findById(jobRole);
+            if (!jobRoleExists) {
+                return res.status(400).json({ error: 'Invalid job role' });
+            }
+            query.jobRole = jobRole;
+        }
+        if(level)
+        {   
+            const levels = await interviewQuesModel.schema.path('level').enumValues.includes(level);
+            if(!levels){
+                return res.status(400).json({error: 'Invalid level'});
+            }
+            query.level = level;
+        }
 
+        if(Object.keys(query).length === 0){
+            query = {};
+        }
+
+        const options = {
+            page: parseInt(page,10)||1,
+            limit: parseInt(limit,10)||6,
+            populate: 'jobRole'
+        }
+        
+        const questions = await interviewQuesModel.paginate(query, options);
+        return res.status(200).json({questions});
 
     }catch(error){
         console.log(error);
@@ -337,52 +362,4 @@ const deleteQuestions = async(req,res)=>{
         return res.status(404).json({error: 'Server error'});
     }
 }
-
-/**
- * @swagger
- * /api/interviewQuestions/search/{searchTerm}:
- *   get:
- *     summary: Search questions by title
- *     tags: [InterviewQuestion]
- *     parameters:
- *       - in: path
- *         name: searchTerm
- *         schema:
- *           type: string
- *         required: true
- *         description: Search term to find questions by title
- *     responses:
- *       '200':
- *         description: Successful response with found questions
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 question:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/InterviewQuestion'
- *       '404':
- *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Error searching questions
- */
-
-const searchQuestions = async (req, res) => {
-    try {
-        const searchTerm = req.params.search;
-        const question = await interviewQuesModel.find({ question: { $regex: searchTerm, $options: 'i' } });
-        res.status(200).json({ question });
-    } catch (error) {
-        console.error('Error searching questions:', error);
-        res.status(500).json({ error: 'Server error' });
-    }
-};
-module.exports = {createQuestions,getQuestions,updateQuestions,deleteQuestions,searchQuestions}
+module.exports = {createQuestions,getQuestions,updateQuestions,deleteQuestions}

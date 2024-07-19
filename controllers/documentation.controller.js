@@ -201,15 +201,34 @@ const getDocumentation = async(req,res)=>{
             }
             return res.status(200).json({documentation});
         }
+        const {sortBy,search,page, limit} = req.query;
+        let query = {};
 
-        const {startIndex, limit} = req.pagination;
+        let sortOptions = {};
+        if (sortBy) {
+            if (sortBy === 'popularity') {
+                sortOptions.popularity = -1;
+            } else if (sortBy === 'alphabetical') {
+                sortOptions.title = 1;
+            }
+        }
+        if(search)
+        {
+            query.title = { $regex: search, $options: 'i' };
+        }
+        if(Object.keys(query).length === 0)
+        {
+            query = {};
+        }
+        const options = {
+            page: parseInt(page) || 1,
+            limit: parseInt(limit) || 6,
+            sort: sortOptions
+        }
 
-        const documentation = await documentationModel.find()
-        .limit(limit)
-        .skip(startIndex);
-        const totalDocumentations = await documentationModel.countDocuments();
-        const totalPages = Math.ceil(totalDocumentations / limit);
-        res.status(200).json({documentation, totalDocumentations, totalPages});
+        const documents = await documentationModel.paginate(query,options)
+
+        return res.status(200).json({documents})
     }
     catch(error)
     {
@@ -262,22 +281,7 @@ const getDocumentation = async(req,res)=>{
 const sortDocumentation = async(req,res)=>{
     
     try{
-        const sortBy = req.query.sortBy;
-        let sortedDocumentations;
-        if(sortBy === 'popularity'){
-
-            sortedDocumentations = await documentationModel.find().sort({popularity: -1});
-            res.status(200).json({sortedDocumentations});
-        }
-        else if (sortBy === 'alphabetical'){
-
-            sortedDocumentations = await documentationModel.find().sort({title: 1});
-            res.status(200).json({sortedDocumentations});
-        }
-        else{
-            const Documentations = await documentationModel.find();
-            res.status(200).json({Documentations});
-        }
+        
        
     }
     catch(error)    
@@ -421,50 +425,5 @@ const deleteDocumentation = async(req,res)=>{
     }
 }
 
-/**
- * @swagger
- * /api/documentation/search/{searchTerm}:
- *   get:
- *     summary: Search documentations by title
- *     tags: [Documentation]
- *     parameters:
- *       - in: path
- *         name: searchTerm
- *         schema:
- *           type: string
- *         required: true
- *         description: Search term to find documentations by title
- *     responses:
- *       '200':
- *         description: Successful response with found documentations
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 findDoc:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Documentation'
- *       '404':
- *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               type: string
- */
 
-
-const searchDocumentation = async(req,res)=>{
-    try{
-        const searchTerm = req.params.search;
-        const findDoc = await documentationModel.find({ title: { $regex: searchTerm, $options: 'i' } });
-        res.status(200).json({ findDoc });
-    }
-    catch(error)
-    {
-        console.log(error);
-        return res.status(404).json("Error")
-    }
-}
-module.exports = {createDocumentation,getDocumentation,sortDocumentation, updateDocumentation,deleteDocumentation,searchDocumentation}
+module.exports = {createDocumentation,getDocumentation,sortDocumentation, updateDocumentation,deleteDocumentation}

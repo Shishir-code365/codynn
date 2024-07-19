@@ -3,10 +3,9 @@ const {createRepository,getRepositories,deleteRepository,upateRepository,searchR
 const paginationMiddleware = require('../middleware/pagination.middleware');
 
 router.post('/create',paginationMiddleware(), createRepository);
-router.get('/get/:id?', paginationMiddleware(), getRepositories);
+router.get('/get/:id?', getRepositories);
 router.put('/update/:id', upateRepository);
 router.delete('/delete/:id', deleteRepository);
-router.get('/search/:search', searchRepo);
 
 
 module.exports = router;

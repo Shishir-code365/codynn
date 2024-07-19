@@ -1,5 +1,6 @@
 const repoModel = require('../models/repository.schema');
 const languageModel = require('../models/language.schema');
+const { populate } = require('../models/video.schema');
 
 /**
  * @swagger
@@ -201,19 +202,30 @@ const getRepositories = async(req, res) => {
             }
             return res.status(200).json({ repository });
         }
-        const MAX_REPOSITORIES_PER_PAGE = parseInt(req.query.limit);
-        const { startIndex, limit } = req.pagination;
-        const repositories = await repoModel.find()
-            .populate('language')
-            .limit(limit)
-            .skip(startIndex);
-        const totalRepositories = await repoModel.countDocuments();
-        const totalPages = Math.ceil(totalRepositories / MAX_REPOSITORIES_PER_PAGE);
+
+        const {language,search, page, limit } = req.query;
+        let query ={};
+        if(language){
+            const languageExists = await languageModel.findById(language);
+            if (!languageExists) {
+                return res.status(400).json({ error: 'Invalid language ID' });
+            }
+            query.language = language;
+        }
+        if(search){
+            query.title = { $regex: search, $options: 'i' };
+        }
+        if (Object.keys(query).length === 0) {
+            query = {}; 
+        }
+
+        const options = {
+            page: parseInt(page,10)||1,
+            limit: parseInt(limit,10)||6,
+            populate: 'language'
+        }
+        const repositories = await repoModel.paginate(query, options);
         res.status(200).json({
-            total: totalRepositories,
-            page: req.pagination.page,
-            limit: req.pagination.limit,
-            totalPages: totalPages,
             repositories
         });
     }
@@ -357,51 +369,5 @@ const deleteRepository = async (req, res) => {
     }
 }
 
-/**
- * @swagger
- * /api/repositories/search/{search}:
- *   get:
- *     summary: Search repositories by title
- *     tags: [Repository]
- *     parameters:
- *       - in: path
- *         name: search
- *         schema:
- *           type: string
- *         required: true
- *         description: The search term for the repository title
- *     responses:
- *       '200':
- *         description: Successful response with matching repositories
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Repository'
- *       '500':
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- */
 
-const searchRepo = async(req,res)=>{
-    try{
-        const searchTerm = req.params.search;
-        const repository = await repoModel.find({ title: { $regex: searchTerm , $options: 'i' } });
-        res.status(200).json({ repository });
-
-    }
-    catch(error)
-    {
-        console.log(error);
-        return res.status(404).json({ error: 'Server error' });
-    }
-}
-
-module.exports = { createRepository,getRepositories,upateRepository,deleteRepository,searchRepo };
+module.exports = { createRepository,getRepositories,upateRepository,deleteRepository};
