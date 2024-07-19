@@ -4,7 +4,6 @@ const paginationMiddleware = require('../middleware/pagination.middleware')
 
 router.post('/create',paginationMiddleware(),createDocumentation);
 router.get('/get/:id?',getDocumentation);
-router.get('/sort',sortDocumentation);
 router.put('/update/:id',updateDocumentation);
 router.delete('/delete/:id',deleteDocumentation);
 

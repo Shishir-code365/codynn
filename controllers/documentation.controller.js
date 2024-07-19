@@ -166,6 +166,16 @@ const createDocumentation = async(req,res)=>{
  *         schema:
  *           type: integer
  *         description: Page number
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *         description: Sort by criteria (popularity, alphabetical)
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search term for documentation titles
  *     responses:
  *       '200':
  *         description: Successful response with paginated documentation data
@@ -174,7 +184,7 @@ const createDocumentation = async(req,res)=>{
  *             schema:
  *               type: object
  *               properties:
- *                 documentation:
+ *                 documents:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Documentation'
@@ -187,9 +197,11 @@ const createDocumentation = async(req,res)=>{
  *         content:
  *           application/json:
  *             schema:
- *               type: string
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  */
-
 
 const getDocumentation = async(req,res)=>{
     try{
@@ -231,60 +243,6 @@ const getDocumentation = async(req,res)=>{
         return res.status(200).json({documents})
     }
     catch(error)
-    {
-        console.log(error);
-        return res.status(404).json("Error")
-    }
-}
-
-/**
- * @swagger
- * /api/documentation/sort:
- *   get:
- *     summary: Sort documentations
- *     tags: [Documentation]
- *     parameters:
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *         required: false
- *         description: The sorting criterion (popularity or alphabetical)
- *         example: popularity
- *     responses:
- *       '200':
- *         description: Successful response with sorted documentations
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 sortedDocumentations:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Documentation'
- *                 Documentations:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Documentation'
- *       '404':
- *         description: Error
- *         content:
- *           application/json:
- *             schema:
- *               type: string
- *               example: Error
- */
-
-
-
-const sortDocumentation = async(req,res)=>{
-    
-    try{
-        
-       
-    }
-    catch(error)    
     {
         console.log(error);
         return res.status(404).json("Error")
@@ -426,4 +384,4 @@ const deleteDocumentation = async(req,res)=>{
 }
 
 
-module.exports = {createDocumentation,getDocumentation,sortDocumentation, updateDocumentation,deleteDocumentation}
+module.exports = {createDocumentation,getDocumentation, updateDocumentation,deleteDocumentation}
